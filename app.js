@@ -369,9 +369,13 @@ async function createPeer(peerUsername){
   const pc = new RTCPeerConnection({iceServers:[{urls:"stun:stun.l.google.com:19302"}]});
   CallState.pc = pc;
   pc.onicecandidate = e=>{ if(e.candidate) socket.emit("ice-candidate",{to: peerUsername, candidate:e.candidate}); };
-  pc.onconnectionstatechange = ()=>{
-    if(pc.connectionState==="failed" || pc.connectionState==="disconnected"){ toast("Потеряно соединение"); endCall(); }
-  };
+pc.onconnectionstatechange = ()=>{
+    if(pc.connectionState==="failed" || pc.connectionState==="disconnected"){
+        console.log("Потеряно соединение");
+        // alert("Потеряно соединение"); // можно так, если хочешь видеть уведомление
+        endCall();
+    }
+};
   pc.ontrack = e=>{
     if(!CallState.remoteStream){ CallState.remoteStream = new MediaStream(); $("#remote-video").srcObject = CallState.remoteStream; }
     e.streams[0].getTracks().forEach(t=> CallState.remoteStream.addTrack(t));
